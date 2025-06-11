@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: victoriametrics
+spec:
+  serviceName: vm
+  selector:
+    matchLabels:
+      app: victoriametrics
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: victoriametrics
+    spec:
+      serviceAccountName: victoria
+      containers:
+        - name: victoriametrics
+          image: docker.io/victoriametrics/victoria-metrics
+          ports:
+            - containerPort: 8428
+              hostPort: 8428
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256M
+          args:
+            - --selfScrapeInterval=5s
+            - --storageDataPath=victoria-metrics-data
+            - --retentionPeriod=8w
+            - --promscrape.config=/config/prometheus.yml
+          volumeMounts:
+            - name: data
+              mountPath: /victoria-metrics-data
+            - name: config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: prometheus
+              
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 5Gi

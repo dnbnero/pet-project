@@ -1,0 +1,8 @@
+.env
+_deploy/seaweedfs/configs/s3.json
+secrets.yaml
+*.log
+*.ipynb
+talosconfig
+controlplane_out.yaml
+_deploy/talos

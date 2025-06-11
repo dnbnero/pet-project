@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: valkey
+  labels:
+    app: valkey
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: valkey
+  template:
+    metadata:
+      labels:
+        app: valkey
+    spec:
+      containers:
+      - name: valkey
+        args:
+          - --save ""
+        image: docker.io/valkey/valkey:8.1
+        ports:
+        - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: valkey
+spec:
+  selector:
+    app: valkey
+  ports:
+  - port: 6379

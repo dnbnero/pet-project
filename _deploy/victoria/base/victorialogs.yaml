@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: victorialogs
+spec:
+  serviceName: vl
+  selector:
+    matchLabels:
+      app: victorialogs
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: victorialogs
+    spec:
+      containers:
+        - name: victorialogs
+          image: docker.io/victoriametrics/victoria-logs
+          ports:
+            - containerPort: 9428
+              hostPort: 9428
+          args:
+            - --storageDataPath=victoria-logs-data
+            - --retentionPeriod=8w
+            - --retention.maxDiskSpaceUsageBytes=10GiB
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256M
+          volumeMounts:
+            - name: data
+              mountPath: /victoria-logs-data
+              
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 11Gi

@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: clickhouse
+
+images:
+  - name: docker.io/clickhouse/clickhouse-server
+    newName: docker.io/clickhouse/clickhouse-server
+    newTag: '25.3'
+
+resources:
+  - statefulset.yaml
+  - namespace.yaml
+  - service.yaml
+
+secretGenerator:
+  - name: ch-pass
+    envs:
+      - ./configs/.env
+
+configMapGenerator:
+  - name: configs
+    files:
+      - ./configs/z_log.xml
+      - ./configs/z_enable_prometheus.xml
+      - ./configs/z_change_log_level.xml
+      - ./configs/z_listen_all.xml
+      - ./configs/z_def_compr.xml
+      
+labels:
+  - pairs:
+      managed-by-kustomize: "true"

@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<clickhouse>
+    <asynchronous_metric_log remove="1"/>
+    <metric_log replace="1">
+        <engine>ENGINE = MergeTree PARTITION BY (event_date)
+                ORDER BY (event_time)
+                TTL event_date + INTERVAL 4 DAY DELETE
+        </engine>
+    </metric_log>
+    <query_thread_log remove="1"/>
+    <query_log replace="1">
+        <engine>ENGINE = MergeTree PARTITION BY (event_date)
+                ORDER BY (event_time)
+                TTL event_date + INTERVAL 4 DAY DELETE
+        </engine>
+    </query_log>
+    <query_views_log replace="1">
+        <engine>ENGINE = MergeTree PARTITION BY (event_date)
+                ORDER BY (event_time)
+                TTL event_date + INTERVAL 4 DAY DELETE
+        </engine>
+    </query_views_log>
+    <part_log replace="1">
+        <engine>ENGINE = MergeTree PARTITION BY (event_date)
+                ORDER BY (event_time)
+                TTL event_date + INTERVAL 4 DAY DELETE
+        </engine>
+    </part_log>
+    <session_log replace="1">
+        <engine>ENGINE = MergeTree PARTITION BY (event_date)
+                ORDER BY (event_time)
+                TTL event_date + INTERVAL 4 DAY DELETE
+        </engine>
+    </session_log>
+    <text_log remove="1"/>
+    <trace_log remove="1"/>
+    <crash_log replace="1">
+        <engine>ENGINE = MergeTree PARTITION BY (event_date)
+                ORDER BY (event_time)
+                TTL event_date + INTERVAL 4 DAY DELETE
+        </engine>
+    </crash_log>
+    <opentelemetry_span_log remove="1"/>
+    <zookeeper_log remove="1"/>
+</clickhouse>

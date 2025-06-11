@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seaweedfs-master
+  labels:
+    app: seaweedfs-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seaweedfs-master
+  template:
+    metadata:
+      labels:
+        app: seaweedfs-master
+    spec:
+      containers:
+      - name: seaweedfs-master
+        image: docker.io/chrislusf/seaweedfs
+        ports:
+          - containerPort: 9333
+          - containerPort: 19333
+          - containerPort: 9324
+        args:
+          - master 
+          - -ip.bind=0.0.0.0
+          - -metricsPort=9324
+          - -volumeSizeLimitMB=1024
+        volumeMounts:
+            - name: master
+              mountPath: "/etc/seaweedfs/"
+              readOnly: true
+      volumes:
+        - name: master
+          projected:
+            sources:
+              - configMap:
+                  name: master
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seaweedfs-master
+spec:
+  clusterIP: None
+  selector:
+    app: seaweedfs-master
+  ports:
+  - port: 9333
+    name: main
+  - port: 19333
+    name: main-grpc
+  - port: 9324
+    name: metrics

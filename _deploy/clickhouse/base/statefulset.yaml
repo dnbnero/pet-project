@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: clickhouse
+spec:
+  serviceName: ch
+  selector:
+    matchLabels:
+      app: clickhouse
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: clickhouse
+          image: docker.io/clickhouse/clickhouse-server
+          securityContext:
+            capabilities:
+              add:
+              - IPC_LOCK
+              - SYS_NICE
+              - NET_ADMIN
+          resources:
+            limits:
+              memory: 16384Mi
+              
+          envFrom:
+          - secretRef:
+              name: ch-pass
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/clickhouse/
+            - name: configs
+              mountPath: "/etc/clickhouse-server/config.d/"
+              readOnly: true
+      volumes:
+        - name: configs
+          configMap:
+            name: configs
+                        
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 100Gi

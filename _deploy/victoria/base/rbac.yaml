@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: victoria
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - nodes
+      - pods
+    verbs:
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: victoria
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: victoria
+subjects:
+  - kind: ServiceAccount
+    name: victoria

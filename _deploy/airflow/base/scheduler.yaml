@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-scheduler
+  labels:
+    app: airflow-scheduler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-scheduler
+  template:
+    metadata:
+      labels:
+        app: airflow-scheduler
+    spec:
+      containers:
+      - name: scheduler
+        image: ghcr.io/dnbnero/airflow
+        env:
+          - name: BASE_URL
+            value: http://api-server:8080
+        envFrom:
+          - secretRef:
+              name: airflow-secrets
+        args:
+          - airflow
+          - scheduler
+        volumeMounts:
+          - name: config
+            mountPath: "/opt/airflow/config/"
+            readOnly: true
+          - name: temp
+            mountPath: /opt/airflow/dags
+          - name: temp
+            mountPath: /opt/airflow/logs
+      volumes:
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: airflow-cfg
+        - name: temp
+          emptyDir:
+            sizeLimit: 500Mi
+            medium: Memory

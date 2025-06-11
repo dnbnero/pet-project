@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: grafana
+spec:
+  serviceName: grafana
+  selector:
+    matchLabels:
+      app: grafana
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: docker.io/grafana/grafana:latest
+          ports:
+            - containerPort: 3000
+              hostPort: 3000
+          env:
+            - name: GF_INSTALL_PLUGINS
+              value: victoriametrics-metrics-datasource
+            - name: GF_DATABASE_TYPE
+              value: postgres
+            - name: GF_DATABASE_HOST
+              value: postgres-0.pg.postgres.svc.cluster.local:5432
+            - name: GF_DATABASE_NAME 
+              value: grafana
+          envFrom:
+            - secretRef:
+                name: secret
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/grafana
+            - name: datasources
+              mountPath: /etc/grafana/provisioning/datasources
+      volumes:
+        - name: datasources
+          configMap:
+            name: datasources
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 3Gi

@@ -1,0 +1,41 @@
+persistence:
+  defaultFsType: xfs
+  defaultClassReplicaCount: 1
+  defaultDataLocality: best-effort
+  volumeBindingMode: "WaitForFirstConsumer"
+  migratable: true
+  removeSnapshotsDuringFilesystemTrim: enabled
+csi:
+  attacherReplicaCount: 1
+  provisionerReplicaCount: 1
+  resizerReplicaCount: 1
+  snapshotterReplicaCount: 1
+defaultSettings:
+  defaultDataPath: /var/mnt/data
+  defaultDataLocality: best-effort
+  replicaAutoBalance: best-effort
+  defaultReplicaCount: 1
+  priorityClass: &defaultPriorityClassNameRef "longhorn-critical"
+  disableRevisionCounter: "true"
+  autoCleanupSystemGeneratedSnapshot: true
+  autoCleanupRecurringJobBackupSnapshot: true
+  orphanResourceAutoDeletion: replica-data;instance
+  autoCleanupSnapshotWhenDeleteBackup: true
+  autoCleanupSnapshotAfterOnDemandBackupCompleted: true
+longhornUI:
+  replicas: 1
+  priorityClass: *defaultPriorityClassNameRef
+  # -- Affinity for Longhorn UI pods. Specify the affinity you want to use for Longhorn UI.
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - longhorn-ui
+            topologyKey: kubernetes.io/hostname
+

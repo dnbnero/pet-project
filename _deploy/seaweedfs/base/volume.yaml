@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: seaweedfs-volume
+spec:
+  serviceName: seaweedfs-volume
+  selector:
+    matchLabels:
+      app: seaweedfs-volume
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: seaweedfs-volume
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: seaweedfs-volume
+          image: docker.io/chrislusf/seaweedfs
+          args:
+            - volume
+            - -mserver=seaweedfs-master:9333
+            - -ip.bind=0.0.0.0
+            - -metricsPort=9325
+            - -dir=/data/volume
+            - -index=leveldb
+          volumeMounts:
+            - name: data
+              mountPath: /data/volume
+                        
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path-qlc
+        resources:
+          requests:
+            storage: 50Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seaweedfs-volume
+spec:
+  clusterIP: None
+  selector:
+    app: seaweedfs-volume
+  ports:
+  - port: 8080
+    name: volume
+  - port: 18080
+    name: volume-grpc
+  - port: 9325
+    name: metrics

@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seaweedfs-filer
+spec:
+  selector:
+    matchLabels:
+      app: seaweedfs-filer
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: seaweedfs-filer
+    spec:
+      containers:
+        - name: seaweedfs-filer
+          image: docker.io/chrislusf/seaweedfs
+          ports:
+            - containerPort: 8888
+            - containerPort: 18888
+            - containerPort: 9326
+          args:
+            - filer
+            - -master=seaweedfs-master:9333
+            - -ip.bind=0.0.0.0
+            - -metricsPort=9326
+            - -port=8888
+            - -s3.port=8333
+          volumeMounts:
+            - name: filer
+              mountPath: "/etc/seaweedfs/"
+              readOnly: true
+      volumes:
+        - name: filer
+          projected:
+            sources:
+              - secret:
+                  name: filer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seaweedfs-filer
+spec:
+  clusterIP: None
+  selector:
+    app: seaweedfs-filer
+  ports:
+  - port: 8888
+    name: filer
+  - port: 18888
+    name: filer-grpc
+  - port: 9326
+    name: metrics

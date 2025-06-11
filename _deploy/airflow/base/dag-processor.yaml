@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-dag-processor
+  labels:
+    app: airflow-dag-processor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-dag-processor
+  template:
+    metadata:
+      labels:
+        app: airflow-dag-processor
+    spec:
+      containers:
+      - name: dag-processor
+        image: ghcr.io/dnbnero/airflow
+        envFrom:
+          - secretRef:
+              name: airflow-secrets
+        args:
+          - airflow
+          - dag-processor
+        volumeMounts:
+          - name: temp
+            mountPath: /opt/airflow/dags
+          - name: temp
+            mountPath: /opt/airflow/logs
+          - name: config
+            mountPath: "/opt/airflow/config"
+            readOnly: false
+      volumes:
+        - name: temp
+          emptyDir:
+            sizeLimit: 500Mi
+            medium: Memory
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: airflow-cfg

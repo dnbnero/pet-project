@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-worker
+  labels:
+    app: airflow-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-worker
+  template:
+    metadata:
+      labels:
+        app: airflow-worker
+    spec:
+      containers:
+      - name: worker
+        imagePullPolicy: Always
+        image: ghcr.io/dnbnero/airflow
+        command:
+          - airflow
+          - celery
+          - worker
+        resources:
+          limits:
+            memory: 4096Mi
+        env:
+          - name: DUMB_INIT_SETSID
+            value: "0"
+        envFrom:
+          - secretRef:
+              name: airflow-secrets
+        volumeMounts:
+          - name: temp
+            mountPath: /opt/airflow/dags
+          - name: temp
+            mountPath: /opt/airflow/logs
+          - name: config
+            mountPath: "/opt/airflow/config/"
+            readOnly: true
+      volumes:
+        - name: temp
+          emptyDir:
+            sizeLimit: 500Mi
+            medium: Memory
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: airflow-cfg
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-worker
+spec:
+  selector:
+    app: airflow-worker
+  ports:
+  - port: 8793

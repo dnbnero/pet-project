@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: seaweedfs
+
+images:
+  - name: docker.io/chrislusf/seaweedfs
+    newName: docker.io/chrislusf/seaweedfs
+    newTag: latest
+
+resources:
+  - ./base/namespace.yaml
+  - ./base/filer.yaml
+  - ./base/master.yaml
+  - ./base/s3.yaml
+  - ./base/volume.yaml
+
+secretGenerator:
+  - name: s3
+    files:
+      - ./configs/s3.json
+  
+
+configMapGenerator:
+  - name: master
+    files:
+      - ./configs/master.toml
+  - name: filer
+    files:
+      - ./configs/filer.toml
+  
+labels:
+  - pairs:
+      managed-by-kustomize: "true"

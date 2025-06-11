@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<clickhouse>
+    <logger>
+        <level>information</level>
+        <console>1</console>
+        <!-- <format>json</format>
+        <formatting>
+            <type>json</type>
+        </formatting> -->
+    </logger>
+</clickhouse>

@@ -1,0 +1,27 @@
+scrape_configs:
+  - job_name: postgres-exporter
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_container_name]
+        regex: postgres-exporter
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        target_label: node
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod
+  - job_name: seaweedfs
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_container_name]
+        regex: seaweedfs.*
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        target_label: node
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod
