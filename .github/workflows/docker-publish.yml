@@ -7,7 +7,7 @@ name: Docker
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     paths:
       - '_deploy/airflow/image/Dockerfile'
       - '_deploy/airflow/image/requirements.txt'
