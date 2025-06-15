@@ -6,3 +6,7 @@ secrets.yaml
 talosconfig
 controlplane_out.yaml
 _deploy/talos
+.venv
+.cache
+__pycache__
+logs/
