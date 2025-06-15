@@ -110,7 +110,7 @@ def run_sqlmesh_models():
             secrets=[
                 {
                     'type': 's3',
-                    'endpoint': (ducklake_data_conn.host+ducklake_data_conn.port),
+                    'endpoint': (ducklake_data_conn.host+str(ducklake_data_conn.port)),
                     'key_id': ducklake_data_conn.login,
                     'secret': ducklake_data_conn.password,
                     'url_style': 'path',
