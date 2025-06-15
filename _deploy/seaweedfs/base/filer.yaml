@@ -15,9 +15,10 @@ spec:
       containers:
         - name: seaweedfs-filer
           image: docker.io/chrislusf/seaweedfs
+          envFrom:
+          - secretRef:
+              name: filer-pg
           ports:
-            - containerPort: 8888
-            - containerPort: 18888
             - containerPort: 9326
           args:
             - filer
@@ -26,16 +27,12 @@ spec:
             - -metricsPort=9326
             - -port=8888
             - -s3.port=8333
-          volumeMounts:
-            - name: filer
-              mountPath: "/etc/seaweedfs/"
-              readOnly: true
       volumes:
-        - name: filer
+        - name: filer-pg
           projected:
             sources:
               - secret:
-                  name: filer
+                  name: filer-pg
 ---
 apiVersion: v1
 kind: Service

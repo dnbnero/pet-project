@@ -19,6 +19,9 @@ secretGenerator:
   - name: s3
     files:
       - ./configs/s3.json
+  - name: filer-pg
+    files:
+      - ./configs/.env
   
 
 configMapGenerator:
