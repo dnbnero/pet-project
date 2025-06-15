@@ -1,0 +1,10 @@
+ipykernel
+duckdb 
+polars 
+ducklake
+jupysql 
+pandas 
+matplotlib 
+plotly 
+duckdb-engine
+pyarrow
