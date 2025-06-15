@@ -75,41 +75,74 @@ def run_sqlmesh_models():
         from sqlmesh.core.config.connection import (
             PostgresConnectionConfig,
             ClickhouseConnectionConfig,
-        )
+            DuckDBConnectionConfig,
+            DuckDBAttachOptions
+        )        
 
-        import sys
-        from pprint import pprint
-
-        pprint(sys.path)
-
-        conn_run = BaseHook.get_connection("sqlmesh_data")
-        conn_state = BaseHook.get_connection("sqlmesh_state")
+        clickhouse_conn = BaseHook.get_connection("sqlmesh_clickhouse")
+        state_conn = BaseHook.get_connection("sqlmesh_state")
+        ducklake_state_conn = BaseHook.get_connection("sqlmesh_ducklake_state")
+        ducklake_data_conn = BaseHook.get_connection("sqlmesh_ducklake_data")
 
         ch_connection = ClickhouseConnectionConfig(
             concurrent_tasks=8,
             pretty_sql=False,
-            host=conn_run.host,
-            username=conn_run.login,
-            password=conn_run.password,
-            port=conn_run.port
+            host=clickhouse_conn.host,
+            username=clickhouse_conn.login,
+            password=clickhouse_conn.password,
+            port=int(clickhouse_conn.port or 8123)
+        )
+
+        state_connection = PostgresConnectionConfig(
+            host=state_conn.host,
+            user=state_conn.login,
+            password=state_conn.password,
+            database=state_conn.schema,
+            port=int(state_conn.port or 5432),
+        )
+
+        duckdb_connection = DuckDBConnectionConfig(
+            extensions=[
+                {'name': 'httpfs'},
+                {'name': 'ducklake'},
+                {'name': 'postgres'}
+            ],
+            secrets=[
+                {
+                    'type': 's3',
+                    'endpoint': (ducklake_data_conn.host+ducklake_data_conn.port),
+                    'key_id': ducklake_data_conn.login,
+                    'secret': ducklake_data_conn.password,
+                    'url_style': 'path',
+                    'use_ssl': False
+                }
+            ],
+            catalogs={
+                'ducklake': DuckDBAttachOptions(
+                    type="ducklake",
+                    path=f"postgres:dbname=ducklake host={ducklake_state_conn.host} port={(ducklake_state_conn.port or 5432)} password={ducklake_state_conn.password} user={ducklake_state_conn.login}",
+                    data_path="s3://ducklake",
+                )
+            }
         )
 
         ctx = Context(
-            config=Config(
+            config = Config(
                 gateways={
-                    "default": GatewayConfig(
+                    "clickhouse": GatewayConfig(
                         connection=ch_connection,
-                        state_connection=PostgresConnectionConfig(
-                            host=conn_state.host,
-                            user=conn_state.login,
-                            password=conn_state.password,
-                            database=conn_state.schema,
-                            port=conn_state.port,
-                        ),
-                        test_connection=ch_connection
+                        state_connection=state_connection,
+                        test_connection=ch_connection,
+                    ),
+                    "duckdb": GatewayConfig(
+                        connection=duckdb_connection,
+                        state_connection=state_connection,
+                        test_connection=duckdb_connection
                     )
                 },
+                default_gateway="duckdb",
                 disable_anonymized_analytics=True,
+                gateway_managed_virtual_layer=True
             )
         )
         
