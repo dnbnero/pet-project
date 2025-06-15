@@ -4,15 +4,15 @@ kind: Kustomization
 namespace: grafana
 
 resources:
-  - ./base/statefulset.yaml
+  - ./base/deployment.yaml
   - ./base/namespace.yaml
   - ./base/service.yaml
 
 configMapGenerator:
   - name: datasources
     files:
-      - ./datasources/prometheus-datasource.yml
-      - ./datasources/victoriametrics-datasource.yml
+      - ./configs/datasources/prometheus-datasource.yml
+      - ./configs/datasources/victoriametrics-datasource.yml
 
 secretGenerator:
   - name: secret

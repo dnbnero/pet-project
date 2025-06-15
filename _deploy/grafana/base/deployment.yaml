@@ -1,9 +1,8 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: grafana
 spec:
-  serviceName: grafana
   selector:
     matchLabels:
       app: grafana
@@ -32,19 +31,9 @@ spec:
             - secretRef:
                 name: secret
           volumeMounts:
-            - name: data
-              mountPath: /var/lib/grafana
             - name: datasources
               mountPath: /etc/grafana/provisioning/datasources
       volumes:
         - name: datasources
           configMap:
             name: datasources
-  volumeClaimTemplates:
-    - metadata:
-        name: data
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 3Gi
