@@ -18,8 +18,6 @@ spec:
       - name: seaweedfs-master
         image: docker.io/chrislusf/seaweedfs
         ports:
-          - containerPort: 9333
-          - containerPort: 19333
           - containerPort: 9324
         args:
           - master 
