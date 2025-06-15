@@ -17,6 +17,7 @@ spec:
       containers:
       - name: scheduler
         image: ghcr.io/dnbnero/airflow
+        imagePullPolicy: Always
         env:
           - name: BASE_URL
             value: http://api-server:8080

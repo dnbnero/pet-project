@@ -19,6 +19,7 @@ spec:
         args:
           - --save ""
         image: docker.io/valkey/valkey:8.1
+        imagePullPolicy: Always
         ports:
         - containerPort: 6379
 ---

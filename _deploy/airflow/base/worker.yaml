@@ -18,6 +18,7 @@ spec:
       - name: worker
         imagePullPolicy: Always
         image: ghcr.io/dnbnero/airflow
+        
         command:
           - airflow
           - celery

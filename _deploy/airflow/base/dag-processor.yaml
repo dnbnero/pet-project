@@ -17,6 +17,7 @@ spec:
       containers:
       - name: dag-processor
         image: ghcr.io/dnbnero/airflow
+        imagePullPolicy: Always
         envFrom:
           - secretRef:
               name: airflow-secrets

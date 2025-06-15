@@ -17,6 +17,7 @@ spec:
       initContainers:
       - name: airflow-init
         image: ghcr.io/dnbnero/airflow
+        imagePullPolicy: Always
         envFrom:
           - secretRef:
               name: airflow-secrets
