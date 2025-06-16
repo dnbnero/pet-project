@@ -1,7 +1,7 @@
 from airflow.sdk import dag, task
 
 @dag 
-def infitation():
+def invitation():
 
     @task
     def get_history(date):
@@ -15,3 +15,5 @@ def infitation():
     get_history(
         date='{{ data_interval_start | ds }}'
     )
+
+invitation()
