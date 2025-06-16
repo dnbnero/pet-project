@@ -1,22 +1,23 @@
 MODEL (
   kind FULL,
-  cron '0 */8 * * *'
+  cron '0 */8 * * *',
+  enabled 'false'
 );
 
 SELECT
-  substr(tconst, 3)::UInt64 AS title_id,
+  SUBSTRING(tconst, 3)::UInt64 AS title_id,
   CASE
     WHEN NOT (
       directors IS NULL
     )
-    THEN arrayMap(x -> substr(x, 3)::UInt64, splitByChar(',', directors::String))
-    ELSE emptyArrayUInt64()
+    THEN ARRAYMAP(x -> SUBSTRING(x, 3)::UInt64, SPLITBYCHAR(',', directors::TEXT))
+    ELSE EMPTYARRAYUINT64()
   END AS directors,
   CASE
     WHEN NOT (
       writers IS NULL
     )
-    THEN arrayMap(x -> substr(x, 3)::UInt64, splitByChar(',', writers::String))
-    ELSE emptyArrayUInt64()
+    THEN ARRAYMAP(x -> SUBSTRING(x, 3)::UInt64, SPLITBYCHAR(',', writers::TEXT))
+    ELSE EMPTYARRAYUINT64()
   END AS writers
-FROM url('https://datasets.imdbws.com/title.crew.tsv.gz', 'TSVWithNames')
+FROM URL('https://datasets.imdbws.com/title.crew.tsv.gz', 'TSVWithNames')
