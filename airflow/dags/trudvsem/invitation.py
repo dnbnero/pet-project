@@ -1,9 +1,19 @@
 from airflow.sdk import dag, task
+from datetime import datetime, timedelta
 
-@dag 
+@dag(
+    schedule='@daily',
+    start_date=datetime(2020,1,1),
+    catchup=True,
+    default_args={
+        'pool': 'trudvsem',
+        'retries': 3,
+        'retry_delay': timedelta(minutes=5)
+    }
+)
 def invitation():
 
-    @task
+    @task(show_return_value_in_logs=False)
     def get_history(date):
         from trudvsem._utils import get_history
 
@@ -12,8 +22,16 @@ def invitation():
             date
         )
     
-    get_history(
+    @task
+    def get_data(link: dict):
+        print(link)
+
+    links = get_history(
         date='{{ data_interval_start | ds }}'
     )
+
+    get_data.expand(links)
+
+
 
 invitation()
