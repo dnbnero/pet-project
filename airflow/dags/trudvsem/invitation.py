@@ -30,7 +30,7 @@ def invitation():
         date='{{ data_interval_start | ds }}'
     )
 
-    get_data.expand(links)
+    get_data.expand(link=links)
 
 
 
