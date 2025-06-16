@@ -8,3 +8,6 @@ matplotlib
 plotly 
 duckdb-engine
 pyarrow
+pendulum
+lxml
+httpx
