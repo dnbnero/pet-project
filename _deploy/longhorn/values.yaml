@@ -11,7 +11,7 @@ csi:
   resizerReplicaCount: 1
   snapshotterReplicaCount: 1
 defaultSettings:
-  defaultDataPath: /var/mnt/data
+  # defaultDataPath: /var/mnt/data
   defaultDataLocality: best-effort
   replicaAutoBalance: best-effort
   defaultReplicaCount: 1
