@@ -1,9 +1,3 @@
-MODEL (
-  kind FULL,
-  cron '0 */8 * * *',
-  enabled 'false'
-);
-
 SELECT
   SUBSTRING(tconst, 3)::UInt64 AS title_id,
   SUBSTRING(parentTconst, 3)::UInt64 AS parent_title_id,

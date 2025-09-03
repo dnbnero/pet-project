@@ -1,18 +1,9 @@
-MODEL (
-  kind FULL,
-  cron '0 */8 * * *',
-  physical_properties (
-    order_by = (title_id, person_id, ordering)
-  ),
-  enabled 'false'
-);
-
 SELECT
   SUBSTRING(tconst, 3)::UInt64 AS title_id,
   ordering::UInt16 AS ordering,
   SUBSTRING(nconst, 3)::UInt64 AS person_id,
-  ASSUMENOTNULL(category)::LowCardinality(STRING) AS category,
-  ASSUMENOTNULL(job)::LowCardinality(STRING) AS job,
+  ASSUMENOTNULL(category)::LowCardinality(String) AS category,
+  ASSUMENOTNULL(job)::LowCardinality(String) AS job,
   CASE
     WHEN NOT (
       characters IS NULL

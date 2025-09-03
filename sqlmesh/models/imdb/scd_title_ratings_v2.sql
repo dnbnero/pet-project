@@ -3,13 +3,11 @@ MODEL (
     unique_key title_id,
     columns [avg_rating, num_votes]
   ),
-  cron '0 */2 * * *',
-  enabled 'false'
+  cron '0 */2 * * *'
 );
 
-
 SELECT
-  title_id as title_id,
-  avg_rating as avg_rating,
-  num_votes as num_votes
+  title_id AS title_id,
+  avg_rating AS avg_rating,
+  num_votes AS num_votes
 FROM imdb_raw.title_ratings
