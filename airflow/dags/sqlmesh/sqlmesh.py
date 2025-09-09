@@ -68,21 +68,18 @@ def run_sqlmesh_models():
 
     @task(on_failure_callback=send_err_log)
     def run():
-        from airflow.hooks.base import BaseHook
+        # from airflow.hooks.base import BaseHook
+        from airflow.sdk import Connection
         
         from sqlmesh.core.context import Context
         from sqlmesh.core.config import Config, GatewayConfig
         from sqlmesh.core.config.connection import (
             PostgresConnectionConfig,
-            ClickhouseConnectionConfig,
-            DuckDBConnectionConfig,
-            DuckDBAttachOptions
+            ClickhouseConnectionConfig
         )        
 
-        clickhouse_conn = BaseHook.get_connection("sqlmesh_clickhouse")
-        state_conn = BaseHook.get_connection("sqlmesh_state")
-        ducklake_state_conn = BaseHook.get_connection("sqlmesh_ducklake_state")
-        ducklake_data_conn = BaseHook.get_connection("sqlmesh_ducklake_data")
+        clickhouse_conn = Connection.get("sqlmesh_clickhouse")
+        state_conn = Connection.get("sqlmesh_state")
 
         ch_connection = ClickhouseConnectionConfig(
             concurrent_tasks=8,
@@ -101,31 +98,6 @@ def run_sqlmesh_models():
             port=int(state_conn.port or 5432),
         )
 
-        duckdb_connection = DuckDBConnectionConfig(
-            extensions=[
-                {'name': 'httpfs'},
-                {'name': 'ducklake'},
-                {'name': 'postgres'}
-            ],
-            secrets=[
-                {
-                    'type': 's3',
-                    'endpoint': (ducklake_data_conn.host+':'+str(ducklake_data_conn.port)),
-                    'key_id': ducklake_data_conn.login,
-                    'secret': ducklake_data_conn.password,
-                    'url_style': 'path',
-                    'use_ssl': False
-                }
-            ],
-            catalogs={
-                'ducklake': DuckDBAttachOptions(
-                    type="ducklake",
-                    path=f"postgres:dbname=ducklake host={ducklake_state_conn.host} port={(ducklake_state_conn.port or 5432)} password={ducklake_state_conn.password} user={ducklake_state_conn.login}",
-                    data_path="s3://ducklake",
-                )
-            }
-        )
-
         ctx = Context(
             config = Config(
                 gateways={
@@ -133,14 +105,9 @@ def run_sqlmesh_models():
                         connection=ch_connection,
                         state_connection=state_connection,
                         test_connection=ch_connection,
-                    ),
-                    "duckdb": GatewayConfig(
-                        connection=duckdb_connection,
-                        state_connection=state_connection,
-                        test_connection=duckdb_connection
                     )
                 },
-                default_gateway="duckdb",
+                default_gateway="clickhouse",
                 disable_anonymized_analytics=True,
                 gateway_managed_virtual_layer=True
             )
