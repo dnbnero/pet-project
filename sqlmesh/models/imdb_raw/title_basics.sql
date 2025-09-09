@@ -11,7 +11,7 @@ SELECT
     WHEN NOT (
       genres IS NULL
     )
-    THEN SPLITBYCHAR(',', genres::String)
-    ELSE EMPTYARRAYSTRING()
-  END::Array(Nullable(LowCardinality(String))) AS genres
-FROM URL('https://datasets.imdbws.com/title.basics.tsv.gz', 'TSVWithNames')
+    THEN splitByChar(',', genres::String)
+    ELSE emptyArrayString()
+  END::Array(LowCardinality(String)) AS genres
+FROM url('https://datasets.imdbws.com/title.basics.tsv.gz', 'TSVWithNames')

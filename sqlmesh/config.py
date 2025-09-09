@@ -31,30 +31,30 @@ ch_connection = ClickhouseConnectionConfig(
     port=int(environ.get("CLICKHOUSE_PORT") or 0),
 )
 
-duckdb_connection = DuckDBConnectionConfig(
-    extensions=[
-        {'name': 'httpfs'},
-        {'name': 'ducklake'},
-        {'name': 'postgres'}
-    ],
-    secrets=[
-        {
-            'type': 's3',
-            'endpoint': '192.168.0.71:30878',
-            'key_id': environ.get("S3_USER"),
-            'secret': environ.get("S3_PASSWORD"),
-            'url_style': 'path',
-            'use_ssl': False
-        }
-    ],
-    catalogs={
-        'ducklake': DuckDBAttachOptions(
-            type="ducklake",
-            path=f"postgres:dbname=ducklake host=192.168.0.71 port=5432 password={environ.get('DUCKDB_POSTGRES_PASSWORD')} user={environ.get('DUCKDB_POSTGRES_USER')}",
-            data_path="s3://ducklake",
-        )
-    }
-)
+# duckdb_connection = DuckDBConnectionConfig(
+#     extensions=[
+#         {'name': 'httpfs'},
+#         {'name': 'ducklake'},
+#         {'name': 'postgres'}
+#     ],
+#     secrets=[
+#         {
+#             'type': 's3',
+#             'endpoint': '192.168.0.71:30878',
+#             'key_id': environ.get("S3_USER"),
+#             'secret': environ.get("S3_PASSWORD"),
+#             'url_style': 'path',
+#             'use_ssl': False
+#         }
+#     ],
+#     catalogs={
+#         'ducklake': DuckDBAttachOptions(
+#             type="ducklake",
+#             path=f"postgres:dbname=ducklake host=192.168.0.71 port=5432 password={environ.get('DUCKDB_POSTGRES_PASSWORD')} user={environ.get('DUCKDB_POSTGRES_USER')}",
+#             data_path="s3://ducklake",
+#         )
+#     }
+# )
 
 config = Config(
     gateways={
@@ -63,15 +63,15 @@ config = Config(
             state_connection=state_connection,
             test_connection=ch_connection,
         ),
-        "duckdb": GatewayConfig(
-            connection=duckdb_connection,
-            state_connection=state_connection,
-            test_connection=duckdb_connection
-        )
+        # "duckdb": GatewayConfig(
+        #     connection=duckdb_connection,
+        #     state_connection=state_connection,
+        #     test_connection=duckdb_connection
+        # )
     },
-    default_gateway="duckdb",
+    default_gateway="clickhouse",
     disable_anonymized_analytics=True,
-    model_defaults=ModelDefaultsConfig(dialect="duckdb", start=None),
+    model_defaults=ModelDefaultsConfig(dialect="clickhouse", start=None),
     model_naming=NameInferenceConfig(infer_names=True),
     gateway_managed_virtual_layer=True
 )

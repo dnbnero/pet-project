@@ -10,3 +10,4 @@ _deploy/talos
 .cache
 __pycache__
 logs/
+.vscode

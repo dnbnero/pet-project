@@ -4,14 +4,14 @@ SELECT
     WHEN NOT (
       directors IS NULL
     )
-    THEN ARRAYMAP(x -> SUBSTRING(x, 3)::UInt64, SPLITBYCHAR(',', directors::String))
-    ELSE EMPTYARRAYUINT64()
+    THEN arrayMap(x -> SUBSTRING(x, 3)::UInt64, splitByChar(',', directors::String))
+    ELSE emptyArrayUInt64()
   END AS directors,
   CASE
     WHEN NOT (
       writers IS NULL
     )
-    THEN ARRAYMAP(x -> SUBSTRING(x, 3)::UInt64, SPLITBYCHAR(',', writers::String))
-    ELSE EMPTYARRAYUINT64()
+    THEN arrayMap(x -> SUBSTRING(x, 3)::UInt64, splitByChar(',', writers::String))
+    ELSE emptyArrayUInt64()
   END AS writers
-FROM URL('https://datasets.imdbws.com/title.crew.tsv.gz', 'TSVWithNames')
+FROM url('https://datasets.imdbws.com/title.crew.tsv.gz', 'TSVWithNames')
