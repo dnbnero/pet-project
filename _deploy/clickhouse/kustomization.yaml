@@ -6,12 +6,12 @@ namespace: clickhouse
 images:
   - name: docker.io/clickhouse/clickhouse-server
     newName: docker.io/clickhouse/clickhouse-server
-    newTag: '25.3'
+    newTag: '25.8'
 
 resources:
-  - statefulset.yaml
-  - namespace.yaml
-  - service.yaml
+  - base/statefulset.yaml
+  - base/namespace.yaml
+  - base/service.yaml
 
 secretGenerator:
   - name: ch-pass

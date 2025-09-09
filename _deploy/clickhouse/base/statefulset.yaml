@@ -26,7 +26,6 @@ spec:
           resources:
             limits:
               memory: 16384Mi
-              
           envFrom:
           - secretRef:
               name: ch-pass
@@ -39,8 +38,7 @@ spec:
       volumes:
         - name: configs
           configMap:
-            name: configs
-                        
+            name: configs     
   volumeClaimTemplates:
     - metadata:
         name: data
